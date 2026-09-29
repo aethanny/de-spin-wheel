@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T18:36:03.470631+00:00",
+  "title": "Design System: Good Spin",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "active-navigation",
+        "value": "0 2px 5px #00000008",
+        "purpose": "Selected navigation item."
+      },
+      {
+        "name": "wheel",
+        "value": "drop-shadow(0 12px 13px #233b3215)",
+        "purpose": "CSS filter on the wheel stage."
+      },
+      {
+        "name": "wheel-hub",
+        "value": "0 4px 12px #233b3220",
+        "purpose": "Wheel hub box shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button",
+        "value": "background .18s, transform .18s",
+        "purpose": "Button feedback."
+      },
+      {
+        "name": "toggle",
+        "value": "transform .2s",
+        "purpose": "Anonymous toggle thumb."
+      },
+      {
+        "name": "spin",
+        "value": "4800ms cubic-bezier(.12,.65,.12,1)",
+        "purpose": "Wheel rotation; duration is 0 with reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack-max",
+        "value": "720px"
+      },
+      {
+        "name": "compact-max",
+        "value": "1000px"
+      },
+      {
+        "name": "wide-min",
+        "value": "1400px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "html": "<button class=\"ds-primary\">Save changes</button>",
+      "css": ".ds-primary{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .18s,transform .18s;border:0;border-radius:9px;padding:13px 22px;background:var(--accent);color:var(--on-accent);font-size:15px;font-weight:600;}.ds-primary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-primary:not(:disabled):active{transform:translateY(1px)}.ds-primary:disabled{opacity:.5;cursor:not-allowed}.ds-primary:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 88%,var(--ink));}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "html": "<button class=\"ds-secondary\">Add prize</button>",
+      "css": ".ds-secondary{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .18s,transform .18s;padding:9px 15px;background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:12px;}.ds-secondary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-secondary:not(:disabled):active{transform:translateY(1px)}.ds-secondary:disabled{opacity:.5;cursor:not-allowed}.ds-secondary:hover:not(:disabled){background:var(--bg);}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Text button",
+      "kind": "button",
+      "html": "<button class=\"ds-text\">Edit prizes</button>",
+      "css": ".ds-text{font-family:\"DM Sans\",sans-serif;cursor:pointer;transition:background .18s,transform .18s;padding:10px 0;border:0;background:none;color:var(--accent);font-size:12px;font-weight:600;}.ds-text:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-text:not(:disabled):active{transform:translateY(1px)}.ds-text:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-text{transition:none}}",
+      "refersTo": "button-text"
+    },
+    {
+      "name": "Name input",
+      "kind": "input",
+      "html": "<label class=\"ds-label\" for=\"ds-name\">Your name</label><input class=\"ds-input\" id=\"ds-name\" placeholder=\"Enter your name\">",
+      "css": ".ds-label{display:block;margin-bottom:7px;font:600 12px \"DM Sans\",sans-serif;color:var(--ink)}.ds-input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;color:var(--ink);padding:12px 14px;font:15px \"DM Sans\",sans-serif;caret-color:var(--accent)}.ds-input::placeholder{color:var(--muted);opacity:.85}.ds-input:focus-visible{outline:3px solid var(--accent);outline-offset:4px}",
+      "refersTo": "input"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Sections\"><button class=\"ds-tab ds-active\">Spin</button><button class=\"ds-tab\">Settings</button><button class=\"ds-tab\">History</button></nav>",
+      "css": ".ds-nav{display:flex;gap:5px;background:color-mix(in srgb,var(--ink) 5%,var(--bg));padding:5px;border-radius:30px}.ds-tab{border:0;border-radius:25px;background:transparent;padding:9px 20px;color:var(--muted);font:600 13px \"DM Sans\",sans-serif;cursor:pointer}.ds-tab.ds-active{background:var(--surface);color:var(--ink);box-shadow:0 2px 5px #00000008}.ds-tab:hover{color:var(--ink)}.ds-tab:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-tab:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Probability total",
+      "kind": "chip",
+      "html": "<span class=\"ds-total\">Total: 100%</span>",
+      "css": ".ds-total{display:inline-block;background:var(--accent);color:var(--on-accent);padding:9px 16px;border-radius:30px;font:15px \"DM Sans\",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-total.ds-invalid{background:#ffe3da;color:#9b321c}",
+      "refersTo": "probability-total"
+    },
+    {
+      "name": "Entry panel",
+      "kind": "card",
+      "html": "<section class=\"ds-panel\"><h2>Try your luck.</h2><p>Enter your name to get started.</p></section>",
+      "css": ".ds-panel{padding:28px 32px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink)}.ds-panel h2{margin:0 0 12px;font:700 40px/1.06 Outfit,sans-serif;letter-spacing:-.025em}.ds-panel p{margin:0;color:var(--muted);font:13px/1.5 \"DM Sans\",sans-serif}",
+      "refersTo": "entry-panel"
+    }
+  ],
+  "narrative": {
+    "overview": "Good Spin uses playful geometry, warm cream, forest green, and four pastel category colors. A large circular wheel anchors a calm interface with bold rounded headings, restrained borders, and clear controls.",
+    "dos": [
+      "Do preserve equal visual slices and show the actual winning percentages separately.",
+      "Do use theme variables for surfaces, text, controls, and category accents.",
+      "Do keep keyboard focus visible, retain control focus during editing, and honor reduced motion.",
+      "Do keep prize names and category labels readable alongside color."
+    ],
+    "donts": [
+      "Don\u2019t imply that slice size represents probability.",
+      "Don\u2019t introduce remote font dependencies or replace the self-hosted font pairing.",
+      "Don\u2019t treat custom palette choices as guaranteed accessible; retain contrast-aware foregrounds."
+    ]
+  }
+}

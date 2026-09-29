@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Good Spin — A little chance. A lot of possibility.</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="logic.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#spin" aria-label="Good Spin home"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><path d="M16 3v26M3 16h26M7 7l18 18M7 25L25 7"/><circle cx="16" cy="16" r="4"/></svg>good<span>spin</span><i></i></a>
+    <nav aria-label="Main navigation"><button data-view="spin" class="nav active" aria-current="page">The wheel</button><button data-view="settings" class="nav">Settings</button><button data-view="history" class="nav">History <span id="history-count">0</span></button></nav>
+    <span class="local-badge"><span></span> Saved on this device</span>
+  </header>
+  <main>
+    <div id="notice" class="notice" role="alert" hidden></div>
+    <section id="spin-view" class="view">
+      <div class="intro"><div><h1>A little chance.<br>A lot of <span>possibility.</span></h1><p>Your name. One spin. A happy little surprise.</p></div><div class="intro-note"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2v36M2 20h36M7 7l26 26M7 33L33 7"/></svg><span>Make someone's<br>day go round.</span></div></div>
+      <div class="play-layout">
+        <div class="wheel-area"><div class="wheel-topline"><span><i class="status-dot"></i> LET CHANCE DO ITS THING</span><span id="prize-count">8 prizes · 4 categories</span></div><div class="wheel-stage"><div class="pointer" aria-hidden="true"></div><div id="wheel-rotor"><svg id="wheel" viewBox="0 0 600 600" role="img" aria-label="Prize wheel"></svg></div><button id="wheel-spin" class="wheel-hub" type="submit" form="spin-form" aria-label="Spin the wheel" aria-describedby="spin-status" disabled>SPIN<small>tap to play</small></button></div><div class="wheel-actions"><button id="shuffle-button" class="secondary" type="button" title="Shuffle prize positions; winning percentages stay the same" disabled>Shuffle</button><button id="sound-toggle" class="secondary sound-toggle" type="button" aria-pressed="true">Sound on</button></div><div id="legend" class="legend"></div><p class="wheel-caption">Equal slices. Individual odds. See every chance below.</p></div>
+        <aside class="entry-panel"><div class="panel-heading"><span class="step-dot">↗</span><span>Your next good thing</span></div><h2>Who's feeling <br>lucky?</h2><p>Add your name and give it a whirl.</p><form id="spin-form"><label for="participant">Your name</label><input id="participant" name="participant" placeholder="e.g. Alex" maxlength="80" required autocomplete="off"><label class="toggle-row" for="anonymous"><span><strong>Keep it anonymous</strong><small>Your name won't appear or be saved.</small></span><input type="checkbox" id="anonymous" role="switch"></label><button id="spin-button" class="primary spin-button" disabled>Spin the wheel <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button><p id="spin-status" class="form-note" aria-live="polite">Loading your wheel…</p></form><div id="result" class="result" aria-live="polite" hidden></div><div class="entry-footer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>A little privacy goes a long way.<br>Your history stays in this browser.</span></div></aside>
+      </div>
+      <section class="prize-section"><div class="section-heading"><div><h2>What's on the wheel</h2><p>A peek at the possibilities. Sample prizes are yours to change.</p></div><button class="text-button" data-view="settings">Customize prizes <span aria-hidden="true">↗</span></button></div><div id="prize-list" class="prize-grid"></div></section>
+    </section>
+    <section id="settings-view" class="view" hidden><div class="page-title"><h1>Make it your own.</h1><p>Four categories. Your prizes. Just the right colors.</p></div><form id="settings-form"><div class="section-heading"><div><h2>Categories & prizes</h2><p>Change one chance; the others rebalance automatically to 100%.</p></div><output id="total" class="total"></output></div><div id="category-editor" class="category-editor"></div><div class="section-heading"><div><h2>Your color story</h2><p>Give the whole page a palette of its own.</p></div><button id="reset-theme" type="button" class="secondary">Reset colors</button></div><div class="theme-presets"><button type="button" data-preset="picnic">Picnic</button><button type="button" data-preset="berry">Berry</button><button type="button" data-preset="lagoon">Lagoon</button></div><div id="theme-editor" class="theme-editor"></div><div class="save-bar"><span id="settings-status" aria-live="polite">Changes apply when you save.</span><button id="save-settings" class="primary">Save changes</button></div></form></section>
+    <section id="history-view" class="view" hidden><div class="page-title"><h1>Good things happened.</h1><p>Every spin has a story. Here are yours.</p></div><div class="section-heading"><h2>Spin history</h2><button id="clear-history" class="secondary">Clear history</button></div><div id="history-list"></div><p class="form-note">Stored in this browser only. Clearing browser data removes your saved history.</p></section>
+  </main>
+  <footer><span class="footer-brand">goodspin.</span><span>A small spin. A good time.</span><span>Made for a little possibility.</span></footer>
+  <dialog id="welcome" aria-labelledby="welcome-title" aria-describedby="welcome-description">
+    <form id="welcome-form">
+      <button type="button" id="welcome-close" class="dialog-close" aria-label="Close welcome prompt">×</button>
+      <h2 id="welcome-title">Your luck starts here.</h2>
+      <p id="welcome-description">Tell us who's spinning. A little surprise awaits.</p>
+      <label for="welcome-name">Your name</label>
+      <input id="welcome-name" maxlength="80" required autocomplete="off" placeholder="e.g. Alex" autofocus>
+      <label class="toggle-row" for="welcome-anonymous"><span><strong>Keep me anonymous</strong><small>Your name won't appear or be saved.</small></span><input id="welcome-anonymous" type="checkbox" role="switch"></label>
+      <button class="primary">Let's give it a spin</button>
+      <p class="form-note">You choose when to spin. Results stay on this device.</p>
+    </form>
+  </dialog>
+</body>
+</html>
