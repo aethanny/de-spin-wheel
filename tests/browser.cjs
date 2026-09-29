@@ -17,7 +17,10 @@ async function records(page) {
   await page.evaluate(()=>{window.savedRandom=crypto.getRandomValues.bind(crypto);crypto.getRandomValues=array=>{array.fill(0);return array;};});
   await page.locator('#shuffle-button').click();
   await page.evaluate(()=>{crypto.getRandomValues=window.savedRandom;});
+  await page.getByText('Shuffle saved on this device. Winning percentages stay the same.').waitFor();
   const afterShuffle=await page.locator('#wheel text').allTextContents();
+  await page.reload();await page.locator('#welcome[open]').waitFor();await page.locator('#welcome-close').click();
+  assert.deepEqual(await page.locator('#wheel text').allTextContents(),afterShuffle);
   assert.notDeepEqual(afterShuffle,beforeShuffle);assert.deepEqual([...afterShuffle].sort(),[...beforeShuffle].sort());
   assert.deepEqual((await page.locator('#prize-list .prize-item').allTextContents()).sort(),beforeChances.sort());
   assert.equal((await records(page)).length,0);

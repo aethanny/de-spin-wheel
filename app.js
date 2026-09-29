@@ -4,7 +4,7 @@ const clone = value => structuredClone(value);
 const palette = { background: '#f7f5ef', text: '#233b32', accent: '#285d46' };
 const colors = ['#f3bf53', '#b9cdb8', '#eaa895', '#c1b8dc'];
 const defaults = () => ({ theme: {...palette}, categories: colors.map((color, i) => ({id: `c${i}`, name: `Category ${i + 1}`, color})), prizes: ['Coffee on us', 'Sweet treat', 'Gift voucher', 'Mystery gift', 'Little surprise', 'Lucky bag', 'Bonus reward', 'Grand prize'].map((name, i) => ({id: `p${i}`, name, categoryId: `c${Math.floor(i / 2)}`, chance: 12.5, image: null})) });
-let db, config, draft, history = [], spinning = false, ready = false, angle = 0;
+let db, config, draft, history = [], spinning = false, shuffling = false, ready = false, angle = 0;
 let wheelOrder = [], imageCache = new WeakMap();
 let imageURLs = [], settingsDirty = false, uploadsPending = 0;
 const gift = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16v11H4zM3 6h18v4H3zM12 6v15M12 6H8a2.5 2.5 0 1 1 2.5-2.5L12 6Zm0 0h4a2.5 2.5 0 1 0-2.5-2.5L12 6Z"/></svg>';
@@ -109,17 +109,22 @@ function sortedPrizes(settings) {
   const prizes = settings.categories.flatMap(c => settings.prizes.filter(p => p.categoryId === c.id));
   return wheelOrder.length ? prizes.sort((a,b) => wheelOrder.indexOf(a.id) - wheelOrder.indexOf(b.id)) : prizes;
 }
-$('#shuffle-button').onclick = () => {
-  if (!ready || spinning || config.prizes.length < 2) return;
+$('#shuffle-button').onclick = async () => {
+  if (!ready || spinning || shuffling || config.prizes.length < 2) return;
   const prizes = sortedPrizes(config);
   for (let i = prizes.length - 1; i > 0; i--) {
     const j = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * (i + 1));
     [prizes[i],prizes[j]] = [prizes[j],prizes[i]];
   }
-  wheelOrder = prizes.map(p => p.id);
+  const next = {...config, wheelOrder: prizes.map(p => p.id)};
+  shuffling = true; lockUI(true); updateSpinState();
+  try { await storage('settings','readwrite',store=>store.put(next,'config')); }
+  catch { announce('Shuffle could not be saved. Free browser storage and try again.'); return; }
+  finally { shuffling = false; lockUI(false); }
+  config = next; wheelOrder = next.wheelOrder;
   angle = 0; $('#wheel-rotor').style.transform = 'rotate(0deg)';
   $('#result').hidden = true; renderWheel();
-  $('#spin-status').textContent = 'Positions shuffled. Winning percentages stay the same.';
+  $('#spin-status').textContent = 'Shuffle saved on this device. Winning percentages stay the same.';
   unlockSound(); tone(523,0,.1); tone(784,.09,.15);
 };
 function thumbnail(prize, category) {
@@ -160,9 +165,9 @@ function renderWheel() {
 }
 function updateSpinState() {
   const error = WheelLogic.validate(config.prizes);
-  $('#spin-button').disabled = $('#wheel-spin').disabled = !ready || spinning || !!error;
-  $('#shuffle-button').disabled = !ready || spinning || config.prizes.length < 2;
-  $('#spin-status').textContent = spinning ? 'A good thing is coming…' : error || 'Ready when you are. Good luck!';
+  $('#spin-button').disabled = $('#wheel-spin').disabled = !ready || spinning || shuffling || !!error;
+  $('#shuffle-button').disabled = !ready || spinning || shuffling || config.prizes.length < 2;
+  $('#spin-status').textContent = shuffling ? 'Saving shuffle…' : spinning ? 'A good thing is coming…' : error || 'Ready when you are. Good luck!';
 }
 function renderHistory() {
   $('#history-count').textContent = history.length;
@@ -175,7 +180,7 @@ function renderHistory() {
   table.append(head,body);wrap.append(table);root.append(wrap);
 }
 function showView(view) {
-  if(spinning) return;
+  if(spinning || shuffling) return;
   if(!['spin','settings','history'].includes(view)) view='spin';
   document.querySelectorAll('.view').forEach(el=>el.hidden=el.id!==`${view}-view`);
   document.querySelectorAll('.nav').forEach(el=>{el.classList.toggle('active',el.dataset.view===view);if(el.dataset.view===view)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
@@ -237,7 +242,7 @@ $('#wheel-spin').onclick = event => {
   if (!$('#participant').value.trim()) { event.preventDefault(); welcome(); }
 };
 $('#spin-form').addEventListener('submit',async event=>{
-  event.preventDefault();if(spinning || !ready)return;
+  event.preventDefault();if(spinning || shuffling || !ready)return;
   const name=$('#participant').value.trim();if(!name){$('#participant').setCustomValidity('Enter your name before spinning.');$('#participant').reportValidity();return;}
   const invalid=WheelLogic.validate(config.prizes);if(invalid){announce(invalid);return;}
   unlockSound();spinning=true;lockUI(true);updateSpinState();announce('');$('#result').hidden=true;
@@ -263,7 +268,7 @@ $('#settings-form').addEventListener('submit',async event=>{
   // Drafts with incomplete totals can be saved; the wheel stays disabled until valid.
   if(error && error!=='Prize chances must total exactly 100%.' && error!=='Add at least one prize before spinning.'){announce(error);return;}
   $('#save-settings').disabled=true;
-  const next=clone(draft);next.categories.forEach(c=>c.name=c.name.trim());next.prizes.forEach(p=>p.name=p.name.trim());
+  const next=clone(draft);next.wheelOrder=[];next.categories.forEach(c=>c.name=c.name.trim());next.prizes.forEach(p=>p.name=p.name.trim());
   try{await storage('settings','readwrite',store=>store.put(next,'config'));config=next;wheelOrder=[];draft=clone(config);settingsDirty=false;imageURLs.forEach(URL.revokeObjectURL);imageURLs=[];imageCache=new WeakMap();applyTheme(config);angle=0;$('#wheel-rotor').style.transform='rotate(0deg)';$('#result').hidden=true;renderWheel();renderEditor();$('#settings-status').textContent=error?'Saved. Complete your prize chances to enable spinning.':'All changes saved on this device.';announce('');}
   catch{announce('Changes could not be saved. Free browser storage or allow site data, then try again. Your edits are still here.');}
   finally{$('#save-settings').disabled=false;}
@@ -277,7 +282,7 @@ $('#clear-history').onclick=async()=>{if(spinning || !history.length || !confirm
 window.addEventListener('beforeunload',event=>{if(settingsDirty || uploadsPending){event.preventDefault();event.returnValue='';}});
 async function init() {
   config=defaults();applyTheme(config);renderWheel();renderHistory();
-  try{db=await openDatabase();db.onversionchange=()=>{db.close();ready=false;updateSpinState();announce('Storage changed in another tab. Reload this page to continue.');};const [saved,records]=await Promise.all([storage('settings','readonly',store=>store.get('config')),storage('history','readonly',store=>store.getAll())]);if(saved)config=saved;else await storage('settings','readwrite',store=>store.put(config,'config'));history=records;ready=true;applyTheme(config);renderWheel();renderHistory();}
+  try{db=await openDatabase();db.onversionchange=()=>{db.close();ready=false;updateSpinState();announce('Storage changed in another tab. Reload this page to continue.');};const [saved,records]=await Promise.all([storage('settings','readonly',store=>store.get('config')),storage('history','readonly',store=>store.getAll())]);if(saved)config=saved;else await storage('settings','readwrite',store=>store.put(config,'config'));history=records;wheelOrder=Array.isArray(config.wheelOrder) ? config.wheelOrder.filter(id=>config.prizes.some(p=>p.id===id)) : [];ready=true;applyTheme(config);renderWheel();renderHistory();}
   catch{announce('Browser storage is unavailable. Allow site data and reload to save settings and spin results.');$('#spin-status').textContent='Storage is required before spinning.';$('#save-settings').disabled=true;}
   showView(location.hash.slice(1)||'spin');welcome();
 }
